@@ -1,10 +1,16 @@
+
 <!DOCTYPE html>
 <html lang="en">
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
 
-    <title>My Web Projects</title>
+    <title>Breine's Web Projects ♡</title>
+
+    <!-- Google Fonts -->
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Lobster&family=Quicksand:wght@400;500;600;700&display=swap" rel="stylesheet">
 
     <style>
         * {
@@ -13,97 +19,362 @@
             padding: 0;
         }
 
-        body {
-            font-family: Arial, sans-serif;
-            min-height: 100vh;
-            display: flex;
-            justify-content: center;
-            align-items: center;
-            background: linear-gradient(135deg, #e8f7fa, #fdf6ee);
-            padding: 30px;
+        html {
+            scroll-behavior: smooth;
         }
 
+        body {
+            font-family: 'Quicksand', sans-serif;
+            min-height: 100vh;
+            overflow-x: hidden;
+            background: linear-gradient(135deg, #e0faff, #fff0f6, #fffbea);
+            color: #39454b;
+            position: relative;
+        }
+
+        /* FLOATING BACKGROUND DECORATIONS */
+
+        .bubble {
+            position: fixed;
+            border-radius: 50%;
+            opacity: 0.45;
+            z-index: 0;
+            pointer-events: none;
+            animation: float 6s ease-in-out infinite;
+        }
+
+        .bubble.one {
+            width: 150px;
+            height: 150px;
+            background: #bde8f5;
+            top: 8%;
+            left: -50px;
+        }
+
+        .bubble.two {
+            width: 190px;
+            height: 190px;
+            background: #ffd9e8;
+            right: -70px;
+            top: 35%;
+            animation-delay: 1s;
+        }
+
+        .bubble.three {
+            width: 120px;
+            height: 120px;
+            background: #fff0b8;
+            bottom: 5%;
+            left: 10%;
+            animation-delay: 2s;
+        }
+
+        @keyframes float {
+            0%, 100% {
+                transform: translateY(0) rotate(0deg);
+            }
+            50% {
+                transform: translateY(-20px) rotate(8deg);
+            }
+        }
+
+        /* MAIN LAYOUT */
+
         .container {
-            width: 100%;
-            max-width: 900px;
+            position: relative;
+            z-index: 1;
+            width: 90%;
+            max-width: 1050px;
+            margin: auto;
+            padding: 70px 0 35px;
             text-align: center;
         }
 
+        /* INTRODUCTION */
+
         .intro {
-            margin-bottom: 45px;
+            animation: fadeDown 1s ease both;
+        }
+
+        .small-text {
+            font-size: 0.9rem;
+            font-weight: 700;
+            letter-spacing: 2px;
+            color: #67a9ca;
+            margin-bottom: 15px;
         }
 
         .intro h1 {
-            font-size: 3rem;
-            margin-bottom: 15px;
-            color: #333;
+            font-family: 'Lobster', cursive;
+            font-size: clamp(3rem, 8vw, 5.5rem);
+            color: #4d93b5;
+            line-height: 1.15;
+            margin-bottom: 18px;
+            text-shadow: 3px 3px 0 rgba(255,255,255,0.8);
+        }
+
+        .intro h1 span {
+            color: #e5a3bd;
         }
 
         .intro p {
-            font-size: 1.1rem;
-            color: #666;
-            max-width: 600px;
+            max-width: 650px;
             margin: auto;
-            line-height: 1.6;
+            line-height: 1.8;
+            font-size: 1.05rem;
+            color: #617078;
         }
+
+        @keyframes fadeDown {
+            from {
+                opacity: 0;
+                transform: translateY(-25px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        }
+
+        /* DECORATIVE DIVIDER */
+
+        .sparkle-line {
+            margin: 30px auto 45px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            gap: 12px;
+            color: #e5a3bd;
+            font-size: 1.2rem;
+        }
+
+        .sparkle-line::before,
+        .sparkle-line::after {
+            content: "";
+            width: 80px;
+            height: 2px;
+            background: #b9dce9;
+        }
+
+        /* PROJECT CARDS */
 
         .websites {
             display: grid;
-            grid-template-columns: repeat(2, 1fr);
-            gap: 25px;
+            grid-template-columns: repeat(2, minmax(0, 1fr));
+            gap: 30px;
         }
 
         .card {
-            background: white;
-            padding: 35px 25px;
-            border-radius: 20px;
-            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
-            transition: 0.3s ease;
+            position: relative;
+            background: rgba(255,255,255,0.85);
+            border: 2px solid rgba(255,255,255,0.95);
+            border-radius: 30px;
+            padding: 42px 30px;
+            box-shadow: 0 15px 35px rgba(91,130,145,0.12);
+            backdrop-filter: blur(8px);
+            overflow: hidden;
+            opacity: 0;
+            animation: cardAppear 0.8s ease forwards;
+            transition: transform 0.35s ease,
+                        box-shadow 0.35s ease;
+        }
+
+        .card:nth-child(1) {
+            animation-delay: 0.25s;
+        }
+
+        .card:nth-child(2) {
+            animation-delay: 0.45s;
+        }
+
+        @keyframes cardAppear {
+            from {
+                opacity: 0;
+                transform: translateY(35px);
+            }
+            to {
+                opacity: 1;
+                transform: translateY(0);
+            }
         }
 
         .card:hover {
-            transform: translateY(-8px);
-            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+            transform: translateY(-10px) rotate(-1deg);
+            box-shadow: 0 22px 45px rgba(91,130,145,0.18);
         }
 
+        /* DECORATIVE CORNERS */
+
+        .card::before {
+            content: "";
+            position: absolute;
+            width: 120px;
+            height: 120px;
+            border-radius: 50%;
+            top: -55px;
+            right: -40px;
+            opacity: 0.5;
+            pointer-events: none;
+        }
+
+        .portfolio::before {
+            background: #c9eef8;
+        }
+
+        .marketplace::before {
+            background: #ffdce9;
+        }
+
+        /* PROJECT ICONS */
+
+        .icon {
+            position: relative;
+            width: 75px;
+            height: 75px;
+            margin: 0 auto 20px;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            border-radius: 50%;
+            font-size: 2rem;
+            transition: transform 0.4s ease;
+        }
+
+        .portfolio .icon {
+            background: #dff6fc;
+        }
+
+        .marketplace .icon {
+            background: #ffe8f0;
+        }
+
+        .card:hover .icon {
+            transform: rotate(12deg) scale(1.12);
+        }
+
+        /* PROJECT TEXT */
+
         .card h2 {
+            font-family: 'Lobster', cursive;
+            font-size: 2.2rem;
             margin-bottom: 15px;
-            color: #333;
+        }
+
+        .portfolio h2 {
+            color: #5899b8;
+        }
+
+        .marketplace h2 {
+            color: #d98da9;
         }
 
         .card p {
-            color: #666;
-            line-height: 1.5;
+            color: #69767c;
+            line-height: 1.8;
             margin-bottom: 25px;
         }
 
+        /* BUTTONS */
+
         .button {
             display: inline-block;
-            padding: 12px 24px;
-            background: #67a9ca;
-            color: white;
+            padding: 13px 25px;
+            border-radius: 30px;
             text-decoration: none;
-            border-radius: 25px;
-            transition: 0.3s ease;
+            color: white;
+            font-size: 0.95rem;
+            font-weight: 700;
+            transition: transform 0.25s ease,
+                        box-shadow 0.25s ease;
+        }
+
+        .portfolio .button {
+            background: #67a9ca;
+            box-shadow: 0 6px 15px rgba(103,169,202,0.25);
+        }
+
+        .marketplace .button {
+            background: #df9bb6;
+            box-shadow: 0 6px 15px rgba(223,155,182,0.25);
         }
 
         .button:hover {
-            background: #4d8fac;
+            transform: translateY(-3px) scale(1.04);
         }
+
+        .portfolio .button:hover {
+            box-shadow: 0 9px 22px rgba(103,169,202,0.4);
+        }
+
+        .marketplace .button:hover {
+            box-shadow: 0 9px 22px rgba(223,155,182,0.4);
+        }
+
+        .button:focus-visible {
+            outline: 3px solid #39454b;
+            outline-offset: 4px;
+        }
+
+        /* FOOTER */
 
         footer {
-            margin-top: 45px;
-            color: #888;
+            margin-top: 55px;
+            color: #879399;
             font-size: 0.9rem;
+            animation: fadeIn 1.5s ease both;
         }
 
-        @media (max-width: 650px) {
+        footer span {
+            color: #df9bb6;
+        }
+
+        @keyframes fadeIn {
+            from { opacity: 0; }
+            to { opacity: 1; }
+        }
+
+        /* MOBILE RESPONSIVENESS */
+
+        @media (max-width: 700px) {
+            .container {
+                padding-top: 50px;
+            }
+
             .websites {
                 grid-template-columns: 1fr;
+                gap: 22px;
+            }
+
+            .card {
+                padding: 35px 25px;
             }
 
             .intro h1 {
-                font-size: 2.3rem;
+                font-size: 3.5rem;
+            }
+
+            .intro p {
+                font-size: 0.98rem;
+            }
+
+            .sparkle-line::before,
+            .sparkle-line::after {
+                width: 45px;
+            }
+        }
+
+        /* RESPECTS REDUCED-MOTION SETTINGS */
+
+        @media (prefers-reduced-motion: reduce) {
+            *, *::before, *::after {
+                animation-duration: 0.01ms !important;
+                animation-iteration-count: 1 !important;
+                scroll-behavior: auto !important;
+                transition-duration: 0.01ms !important;
+            }
+
+            .card {
+                opacity: 1;
             }
         }
     </style>
@@ -111,50 +382,80 @@
 
 <body>
 
+    <!-- FLOATING DECORATIONS -->
+
+    <div class="bubble one"></div>
+    <div class="bubble two"></div>
+    <div class="bubble three"></div>
+
     <main class="container">
 
+        <!-- INTRODUCTION -->
+
         <section class="intro">
-            <h1>My Web Projects</h1>
+            <div class="small-text">
+                ✦ WELCOME TO MY LITTLE CORNER ✦
+            </div>
+
+            <h1>My <span>Web</span> Projects</h1>
 
             <p>
-                Welcome! Explore my web projects, featuring my creative
-                portfolio and an online marketplace concept.
+                A little collection of my creative web projects —
+                from my personal portfolio to a playful online
+                marketplace concept. Take a look around!
             </p>
         </section>
 
-        <section class="websites">
+        <div class="sparkle-line" aria-hidden="true">
+            ✦ ♡ ✦
+        </div>
 
-            <div class="card">
+        <!-- PROJECT SELECTION -->
+
+        <section class="websites" aria-label="My websites">
+
+            <!-- PERSONAL PORTFOLIO -->
+
+            <article class="card portfolio">
+                <div class="icon" aria-hidden="true">🎨</div>
+
                 <h2>Arterie</h2>
 
                 <p>
-                    A personal creative portfolio showcasing my skills,
-                    experiences, activities, education, and selected works.
+                    My personal creative portfolio showcasing my
+                    skills, experiences, activities, education,
+                    and selected works in design and media.
                 </p>
 
                 <a href="arterie/" class="button">
-                    View Portfolio
+                    Explore Portfolio →
                 </a>
-            </div>
+            </article>
 
+            <!-- ONLINE MARKETPLACE -->
 
-            <div class="card">
-                <h2>Charm & Carry</h2>
+            <article class="card marketplace">
+                <div class="icon" aria-hidden="true">🛍️</div>
+
+                <h2>Charm &amp; Carry</h2>
 
                 <p>
-                    An online marketplace concept featuring canvas bags,
-                    phone charms, and shoe charms.
+                    A playful Filipino online marketplace concept
+                    featuring canvas bags, phone charms,
+                    and shoe charms.
                 </p>
 
                 <a href="charm-and-carry/" class="button">
-                    Visit Marketplace
+                    Visit Marketplace →
                 </a>
-            </div>
+            </article>
 
         </section>
 
+        <!-- FOOTER -->
+
         <footer>
-            <p>© 2026 Abreine Torres</p>
+            Made with <span>♡</span> and a little creativity · 2026
         </footer>
 
     </main>
