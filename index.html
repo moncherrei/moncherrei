@@ -1,0 +1,163 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+
+    <title>My Web Projects</title>
+
+    <style>
+        * {
+            box-sizing: border-box;
+            margin: 0;
+            padding: 0;
+        }
+
+        body {
+            font-family: Arial, sans-serif;
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            background: linear-gradient(135deg, #e8f7fa, #fdf6ee);
+            padding: 30px;
+        }
+
+        .container {
+            width: 100%;
+            max-width: 900px;
+            text-align: center;
+        }
+
+        .intro {
+            margin-bottom: 45px;
+        }
+
+        .intro h1 {
+            font-size: 3rem;
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .intro p {
+            font-size: 1.1rem;
+            color: #666;
+            max-width: 600px;
+            margin: auto;
+            line-height: 1.6;
+        }
+
+        .websites {
+            display: grid;
+            grid-template-columns: repeat(2, 1fr);
+            gap: 25px;
+        }
+
+        .card {
+            background: white;
+            padding: 35px 25px;
+            border-radius: 20px;
+            box-shadow: 0 8px 25px rgba(0, 0, 0, 0.08);
+            transition: 0.3s ease;
+        }
+
+        .card:hover {
+            transform: translateY(-8px);
+            box-shadow: 0 12px 30px rgba(0, 0, 0, 0.12);
+        }
+
+        .card h2 {
+            margin-bottom: 15px;
+            color: #333;
+        }
+
+        .card p {
+            color: #666;
+            line-height: 1.5;
+            margin-bottom: 25px;
+        }
+
+        .button {
+            display: inline-block;
+            padding: 12px 24px;
+            background: #67a9ca;
+            color: white;
+            text-decoration: none;
+            border-radius: 25px;
+            transition: 0.3s ease;
+        }
+
+        .button:hover {
+            background: #4d8fac;
+        }
+
+        footer {
+            margin-top: 45px;
+            color: #888;
+            font-size: 0.9rem;
+        }
+
+        @media (max-width: 650px) {
+            .websites {
+                grid-template-columns: 1fr;
+            }
+
+            .intro h1 {
+                font-size: 2.3rem;
+            }
+        }
+    </style>
+</head>
+
+<body>
+
+    <main class="container">
+
+        <section class="intro">
+            <h1>My Web Projects</h1>
+
+            <p>
+                Welcome! Explore my web projects, featuring my creative
+                portfolio and an online marketplace concept.
+            </p>
+        </section>
+
+        <section class="websites">
+
+            <div class="card">
+                <h2>Arterie</h2>
+
+                <p>
+                    A personal creative portfolio showcasing my skills,
+                    experiences, activities, education, and selected works.
+                </p>
+
+                <a href="arterie/" class="button">
+                    View Portfolio
+                </a>
+            </div>
+
+
+            <div class="card">
+                <h2>Charm & Carry</h2>
+
+                <p>
+                    An online marketplace concept featuring canvas bags,
+                    phone charms, and shoe charms.
+                </p>
+
+                <a href="charm-and-carry/" class="button">
+                    Visit Marketplace
+                </a>
+            </div>
+
+        </section>
+
+        <footer>
+            <p>© 2026 Abreine Torres</p>
+        </footer>
+
+    </main>
+
+</body>
+</html>
