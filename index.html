@@ -159,50 +159,41 @@ hudToggle.addEventListener('click', () => {
   hudToggle.textContent = collapsed ? '⌄' : '⌃';
 });
 
-/* ---------- Music (upbeat, synthesized kawaii chiptune; opt-in) ---------- */
-let ac, mg, mt = null, ni = 0;
-// A bright C-major / A-minor loop with a little syncopation.
-const lead = [659.25,783.99,987.77,783.99,698.46,880,1046.5,880,659.25,783.99,880,1174.66,1046.5,880,783.99,698.46];
-const bass = [130.81,196,164.81,246.94,110,164.81,146.83,220];
-function voice(freq, duration=.18, wave='triangle', volume=.035, delay=0) {
-  if (!ac || ac.state !== 'running') return;
-  const t = ac.currentTime + delay, osc = ac.createOscillator(), gain = ac.createGain();
-  osc.type = wave; osc.frequency.setValueAtTime(freq, t);
-  gain.gain.setValueAtTime(.0001, t);
-  gain.gain.exponentialRampToValueAtTime(volume, t + .012);
-  gain.gain.exponentialRampToValueAtTime(.0001, t + duration);
-  osc.connect(gain); gain.connect(mg); osc.start(t); osc.stop(t + duration + .025);
-}
-function kick() {
-  if (!ac || ac.state !== 'running') return;
-  const t = ac.currentTime, osc = ac.createOscillator(), gain = ac.createGain();
-  osc.type = 'sine'; osc.frequency.setValueAtTime(125, t); osc.frequency.exponentialRampToValueAtTime(48, t + .11);
-  gain.gain.setValueAtTime(.0001, t); gain.gain.exponentialRampToValueAtTime(.11, t + .008); gain.gain.exponentialRampToValueAtTime(.0001, t + .13);
-  osc.connect(gain); gain.connect(mg); osc.start(t); osc.stop(t + .14);
-}
-function musicTick() {
-  const step = ni++ % 16;
-  voice(lead[step], .19, step % 4 === 2 ? 'sine' : 'triangle', .042);
-  // Sparkly off-beat answer notes make it feel more like a tiny game soundtrack.
-  if (step % 2 === 1) voice(lead[(step + 3) % 16] * 2, .09, 'sine', .012, .075);
-  if (step % 2 === 0) voice(bass[Math.floor(step / 2) % bass.length], .25, 'triangle', .048);
-  if (step % 4 === 0) kick();
-}
+/* ---------- Fairytail Quest background music (opt-in) ---------- */
+// Download the Pixabay track and save it beside this index.html as:
+// fairytail-quest.mp3
+const bgMusic = new Audio('./fairytail-quest.mp3');
+bgMusic.loop = true;
+bgMusic.preload = 'none';
+bgMusic.volume = 0.32;
+let musicOn = false;
 async function music(on) {
   if (on) {
-    const C = window.AudioContext || window.webkitAudioContext;
-    if (!C) { $('ml').textContent = 'No audio'; return; }
-    if (!ac) { ac = new C(); mg = ac.createGain(); mg.gain.value = .52; mg.connect(ac.destination); }
-    await ac.resume();
-    if (mt !== null) clearInterval(mt);
-    musicTick(); mt = setInterval(musicTick, 220);
-  } else { if (mt !== null) clearInterval(mt); mt = null; }
-  $('musicBtn').setAttribute('aria-pressed', on);
-  $('musicBtn').setAttribute('aria-label', on ? 'Turn off upbeat music' : 'Turn on upbeat music');
-  $('ml').textContent = on ? 'Music on' : 'Music off';
+    try {
+      await bgMusic.play();
+      musicOn = true;
+      $('ml').textContent = 'Music on';
+      $('musicBtn').setAttribute('aria-label', 'Turn off Fairytail Quest music');
+    } catch (err) {
+      musicOn = false;
+      $('ml').textContent = 'Tap to retry';
+      $('musicBtn').setAttribute('aria-label', 'Play Fairytail Quest music');
+      return;
+    }
+  } else {
+    bgMusic.pause();
+    musicOn = false;
+    $('ml').textContent = 'Music off';
+    $('musicBtn').setAttribute('aria-label', 'Turn on Fairytail Quest music');
+  }
+  $('musicBtn').setAttribute('aria-pressed', String(musicOn));
 }
-$('musicBtn').onclick = () => music(mt === null).catch(() => $('ml').textContent = 'Tap to retry');
-document.addEventListener('visibilitychange', () => { if (document.hidden && mt !== null) music(false); });
+$('musicBtn').onclick = () => music(!musicOn);
+bgMusic.addEventListener('error', () => {
+  $('ml').textContent = 'Add music file';
+  $('musicBtn').setAttribute('aria-label', 'Music file missing — add fairytail-quest.mp3');
+});
+document.addEventListener('visibilitychange', () => { if (document.hidden && musicOn) music(false); });
 
 /* ---------- WebGL check (falls back to plain links) ---------- */
 let R;
