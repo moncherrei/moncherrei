@@ -160,39 +160,62 @@ hudToggle.addEventListener('click', () => {
 });
 
 /* ---------- Fairytail Quest background music (opt-in) ---------- */
-// Download the Pixabay track and save it beside this index.html as:
-// fairytail-quest.mp3
-const bgMusic = new Audio('./fairytail-quest.mp3');
+// Try common Pixabay download names. Best option: rename your uploaded track
+// to fairytail-quest.mp3 and keep it in the same folder as index.html.
+const musicFiles = [
+  './fairytail-quest.mp3',
+  './dreamy-childrens-fairytail-quest-for-game-394561.mp3',
+  './fairytail-quest-for-game-394561.mp3',
+  './Fairytail Quest (for GAME).mp3',
+  './Fairytail Quest.mp3',
+  './fairytail quest.mp3'
+];
+const bgMusic = new Audio();
 bgMusic.loop = true;
-bgMusic.preload = 'none';
+bgMusic.preload = 'metadata';
 bgMusic.volume = 0.32;
-let musicOn = false;
+let musicOn = false, musicFileIndex = 0;
+function setMusicLabel(label, aria) {
+  $('ml').textContent = label;
+  $('musicBtn').setAttribute('aria-label', aria);
+}
+function tryNextMusicFile() {
+  musicFileIndex++;
+  if (musicFileIndex < musicFiles.length) {
+    bgMusic.src = musicFiles[musicFileIndex];
+    bgMusic.load();
+    return true;
+  }
+  setMusicLabel('File not found', 'Music file not found — check the MP3 filename');
+  return false;
+}
+bgMusic.src = musicFiles[musicFileIndex];
+bgMusic.addEventListener('error', () => {
+  if (musicOn && tryNextMusicFile()) bgMusic.play().catch(() => {});
+  else if (!musicOn) tryNextMusicFile();
+});
 async function music(on) {
   if (on) {
+    musicOn = true;
+    setMusicLabel('Loading music…', 'Loading Fairytail Quest music');
+    $('musicBtn').setAttribute('aria-pressed', 'true');
     try {
       await bgMusic.play();
-      musicOn = true;
-      $('ml').textContent = 'Music on';
-      $('musicBtn').setAttribute('aria-label', 'Turn off Fairytail Quest music');
+      setMusicLabel('Music on', 'Turn off Fairytail Quest music');
     } catch (err) {
       musicOn = false;
-      $('ml').textContent = 'Tap to retry';
-      $('musicBtn').setAttribute('aria-label', 'Play Fairytail Quest music');
-      return;
+      $('musicBtn').setAttribute('aria-pressed', 'false');
+      setMusicLabel('Music error', 'Music could not play — check the audio file name');
+      console.error('Could not play Fairytail Quest audio:', err);
     }
   } else {
     bgMusic.pause();
     musicOn = false;
-    $('ml').textContent = 'Music off';
-    $('musicBtn').setAttribute('aria-label', 'Turn on Fairytail Quest music');
+    $('musicBtn').setAttribute('aria-pressed', 'false');
+    setMusicLabel('Music off', 'Turn on Fairytail Quest music');
   }
-  $('musicBtn').setAttribute('aria-pressed', String(musicOn));
 }
 $('musicBtn').onclick = () => music(!musicOn);
-bgMusic.addEventListener('error', () => {
-  $('ml').textContent = 'Add music file';
-  $('musicBtn').setAttribute('aria-label', 'Music file missing — add fairytail-quest.mp3');
-});
 document.addEventListener('visibilitychange', () => { if (document.hidden && musicOn) music(false); });
 
 /* ---------- WebGL check (falls back to plain links) ---------- */
