@@ -160,23 +160,36 @@ hudToggle.addEventListener('click', () => {
 });
 
 /* ---------- Fairytail Quest background music (opt-in) ---------- */
-// The MP3 is in the same root folder as index.html on GitHub Pages.
-const bgMusic = new Audio('./fairytail-quest.mp3');
+// Keep the MP3 in the same folder as this index.html. The first filename
+// is the recommended one; the alternatives cover common Pixabay download names.
+const musicFiles = [
+  './good_b_music-fairytail-quest-for-game-394561.mp3',
+  './fairytail-quest.mp3',
+  './dreamy-childrens-fairytail-quest-for-game-394561.mp3',
+  './fairytail-quest-for-game-394561.mp3',
+  './Fairytail Quest (for GAME).mp3',
+  './Fairytail Quest.mp3',
+  './fairytail quest.mp3'
+];
+const bgMusic = new Audio();
 bgMusic.loop = true;
 bgMusic.preload = 'auto';
 bgMusic.volume = 0.32;
-let musicOn = false;
+let musicOn = false, musicFileIndex = 0, musicAttempt = 0;
 function setMusicLabel(label, aria) {
   $('ml').textContent = label;
   $('musicBtn').setAttribute('aria-label', aria);
 }
-bgMusic.addEventListener('error', () => {
-  if (!musicOn) return;
-  musicOn = false;
-  $('musicBtn').setAttribute('aria-pressed', 'false');
-  setMusicLabel('Audio failed', 'Audio failed to load; check the MP3 URL');
-  console.error('Audio failed to load:', bgMusic.currentSrc, bgMusic.error);
-});
+function loadCandidate(index) {
+  return new Promise((resolve, reject) => {
+    bgMusic.pause();
+    bgMusic.onerror = () => { cleanup(); reject(new Error('Could not load ' + musicFiles[index])); };
+    bgMusic.oncanplaythrough = () => { cleanup(); resolve(); };
+    function cleanup() { bgMusic.onerror = null; bgMusic.oncanplaythrough = null; }
+    bgMusic.src = musicFiles[index];
+    bgMusic.load();
+  });
+}
 async function music(on) {
   if (!on) {
     bgMusic.pause();
@@ -188,22 +201,30 @@ async function music(on) {
   musicOn = true;
   $('musicBtn').setAttribute('aria-pressed', 'true');
   setMusicLabel('Loading music…', 'Loading Fairytail Quest music');
-  try {
-    // Call play immediately inside the click handler so the browser recognizes
-    // the user's gesture; the browser can buffer the MP3 while it starts.
-    await bgMusic.play();
-    setMusicLabel('Music on', 'Turn off Fairytail Quest music');
-  } catch (err) {
-    musicOn = false;
-    $('musicBtn').setAttribute('aria-pressed', 'false');
-    setMusicLabel('Tap to retry', 'Music did not start; tap to try again');
-    console.error('Could not play Fairytail Quest audio:', err);
+  const attemptId = ++musicAttempt;
+  let lastError;
+  for (let i = 0; i < musicFiles.length; i++) {
+    if (attemptId !== musicAttempt) return;
+    try {
+      await loadCandidate(i);
+      if (attemptId !== musicAttempt) return;
+      await bgMusic.play();
+      if (attemptId !== musicAttempt) { bgMusic.pause(); return; }
+      musicFileIndex = i;
+      setMusicLabel('Music on', 'Turn off Fairytail Quest music');
+      return;
+    } catch (err) {
+      lastError = err;
+      console.warn('Audio candidate failed:', musicFiles[i], err);
+    }
   }
+  musicOn = false;
+  $('musicBtn').setAttribute('aria-pressed', 'false');
+  setMusicLabel('Audio not found', 'Audio could not be loaded; check the MP3 filename and folder');
+  console.error('Could not load Fairytail Quest audio. Tried:', musicFiles, lastError);
 }
 $('musicBtn').onclick = () => music(!musicOn);
-document.addEventListener('visibilitychange', () => {
-  if (document.hidden && musicOn) music(false);
-});
+document.addEventListener('visibilitychange', () => { if (document.hidden && musicOn) music(false); });
 
 /* ---------- WebGL check (falls back to plain links) ---------- */
 let R;
