@@ -24,8 +24,18 @@ body.dark #stage::after{background:radial-gradient(ellipse at 50% 55%,transparen
 button,a{font:inherit;-webkit-tap-highlight-color:transparent}
 :focus-visible{outline:3px solid var(--focus);outline-offset:3px}
 .card{background:var(--card);border:1.5px solid var(--line);border-radius:22px;backdrop-filter:blur(10px);box-shadow:0 10px 30px rgba(70,110,130,.16)}
-.hud-tl{position:fixed;top:14px;left:14px;max-width:min(340px,calc(100% - 190px));padding:13px 17px 14px;z-index:5}
-.hud-tl h1{font:400 clamp(1.7rem,4.6vw,2.4rem)/1.1 'Lobster',cursive;color:var(--blue-d)}
+.hud-tl{position:fixed;top:14px;left:14px;width:max-content;max-width:min(360px,calc(100% - 190px));padding:12px 14px 14px;z-index:5;transition:padding .28s ease,background .28s ease,box-shadow .28s ease}
+.hud-head{display:flex;align-items:center;gap:12px;justify-content:space-between}
+.hud-tl h1{font:400 clamp(1.55rem,4.2vw,2.2rem)/1.1 'Lobster',cursive;color:var(--blue-d)}
+.hud-collapse{flex:0 0 auto;display:grid;place-items:center;width:34px;height:34px;border:1.5px solid var(--line);border-radius:50%;background:rgba(255,255,255,.48);color:var(--ink);font-size:1.1rem;font-weight:700;cursor:pointer;transition:transform .25s,background .25s}
+.hud-collapse:hover{transform:scale(1.08);background:rgba(255,255,255,.8)}
+.hud-body{overflow:hidden;max-height:220px;opacity:1;transition:max-height .32s ease,opacity .2s ease,margin .32s ease}
+.hud-tl.is-collapsed{padding:7px 9px;border-radius:999px}
+.hud-tl.is-collapsed .hud-head{gap:8px}
+.hud-tl.is-collapsed h1{font-size:1rem;white-space:nowrap}
+.hud-tl.is-collapsed .hud-collapse{transform:rotate(180deg)}
+.hud-tl.is-collapsed .hud-body{max-height:0;opacity:0;margin:0;pointer-events:none}
+.hud-tl.is-collapsed .hud-body *{pointer-events:none}
 body.dark .hud-tl h1{color:#9bdcf1}
 .hud-tl p{margin:5px 0 10px;font-size:.88rem;line-height:1.45;color:var(--muted)}
 .quick{display:flex;flex-wrap:wrap;gap:7px}
@@ -59,7 +69,7 @@ body.near .hint{opacity:0;pointer-events:none}
 .no3d .hud-tr,.no3d .hint,.no3d .prompt{display:none}
 .no3d .hud-tl{top:50%;left:50%;transform:translate(-50%,-50%);max-width:92vw;text-align:center}
 .no3d .quick{justify-content:center}
-@media(max-width:760px){.hud-tr .ubtn span:last-child{display:none}.hud-tr .ubtn{padding:8px}.hud-tr{flex-direction:column}.hud-tl{max-width:calc(100% - 84px)}.hint{font-size:.8rem}}
+@media(max-width:760px){.hud-tr .ubtn span:last-child{display:none}.hud-tr .ubtn{padding:8px}.hud-tr{flex-direction:column}.hud-tl{max-width:calc(100% - 84px)}.hud-tl.is-collapsed{max-width:calc(100% - 84px)}.hud-tl.is-collapsed h1{font-size:.95rem}.hint{font-size:.8rem}}
 @media(prefers-reduced-motion:reduce){*,*::before,*::after{animation-duration:.01ms!important;transition-duration:.01ms!important}}
 [hidden]{display:none!important}
 .joy{display:none;position:fixed;left:22px;bottom:calc(26px + env(safe-area-inset-bottom));width:118px;height:118px;border-radius:50%;background:rgba(255,255,255,.35);border:2px solid var(--line);backdrop-filter:blur(6px);touch-action:none;z-index:6}
@@ -95,14 +105,19 @@ body.dark .scroll li.done{color:#8fdcae}
   </div>
 </div>
 
-<header class="hud-tl card">
-  <h1>My Web Projects</h1>
-  <p>Two little worlds on one floating island. Walk up to a door to go inside.</p>
-  <nav class="quick" aria-label="Projects">
-    <a class="pill" style="--b:#3b82a6" data-site="arterie" href="arterie/" target="_blank" rel="noopener">Arterie</a>
-    <a class="pill" style="--b:#c4678f" data-site="charm" href="marketplace/" target="_blank" rel="noopener">Charm &amp; Carry</a>
-    <a class="pill" id="notePill" hidden style="--b:#7a5cc0" data-site="note" href="#">Story spot</a>
-  </nav>
+<header class="hud-tl card" id="projectHud">
+  <div class="hud-head">
+    <h1 id="hudTitle">My Web Projects</h1>
+    <button class="hud-collapse" id="hudToggle" type="button" aria-expanded="true" aria-controls="hudBody" aria-label="Collapse project panel">⌃</button>
+  </div>
+  <div class="hud-body" id="hudBody">
+    <p>Two little worlds on one floating island. Walk up to a door to go inside.</p>
+    <nav class="quick" aria-label="Projects">
+      <a class="pill" style="--b:#3b82a6" data-site="arterie" href="arterie/" target="_blank" rel="noopener">Arterie</a>
+      <a class="pill" style="--b:#c4678f" data-site="charm" href="marketplace/" target="_blank" rel="noopener">Charm &amp; Carry</a>
+      <a class="pill" id="notePill" hidden style="--b:#7a5cc0" data-site="note" href="#">Story spot</a>
+    </nav>
+  </div>
 </header>
 
 <div class="hud-tr">
@@ -135,26 +150,55 @@ const body = document.body, reduce = matchMedia('(prefers-reduced-motion: reduce
 const touch = matchMedia('(pointer: coarse)').matches;
 if (touch) $('hint').textContent = 'Joystick to walk · drag to look · pinch to zoom';
 
-/* ---------- Music (synthesized chimes, opt-in) ---------- */
+/* ---------- Retractable project label ---------- */
+const projectHud = $('projectHud'), hudToggle = $('hudToggle');
+hudToggle.addEventListener('click', () => {
+  const collapsed = projectHud.classList.toggle('is-collapsed');
+  hudToggle.setAttribute('aria-expanded', String(!collapsed));
+  hudToggle.setAttribute('aria-label', collapsed ? 'Expand project panel' : 'Collapse project panel');
+  hudToggle.textContent = collapsed ? '⌄' : '⌃';
+});
+
+/* ---------- Music (upbeat, synthesized kawaii chiptune; opt-in) ---------- */
 let ac, mg, mt = null, ni = 0;
-const mel = [523.25,659.25,783.99,659.25,587.33,698.46,783.99,698.46];
-const note = f => {
+// A bright C-major / A-minor loop with a little syncopation.
+const lead = [659.25,783.99,987.77,783.99,698.46,880,1046.5,880,659.25,783.99,880,1174.66,1046.5,880,783.99,698.46];
+const bass = [130.81,196,164.81,246.94,110,164.81,146.83,220];
+function voice(freq, duration=.18, wave='triangle', volume=.035, delay=0) {
   if (!ac || ac.state !== 'running') return;
-  const o = ac.createOscillator(), g = ac.createGain(), n = ac.currentTime;
-  o.frequency.value = f; g.gain.setValueAtTime(.0001, n);
-  g.gain.exponentialRampToValueAtTime(.045, n + .04); g.gain.exponentialRampToValueAtTime(.0001, n + .48);
-  o.connect(g); g.connect(mg); o.start(); o.stop(n + .5);
-};
+  const t = ac.currentTime + delay, osc = ac.createOscillator(), gain = ac.createGain();
+  osc.type = wave; osc.frequency.setValueAtTime(freq, t);
+  gain.gain.setValueAtTime(.0001, t);
+  gain.gain.exponentialRampToValueAtTime(volume, t + .012);
+  gain.gain.exponentialRampToValueAtTime(.0001, t + duration);
+  osc.connect(gain); gain.connect(mg); osc.start(t); osc.stop(t + duration + .025);
+}
+function kick() {
+  if (!ac || ac.state !== 'running') return;
+  const t = ac.currentTime, osc = ac.createOscillator(), gain = ac.createGain();
+  osc.type = 'sine'; osc.frequency.setValueAtTime(125, t); osc.frequency.exponentialRampToValueAtTime(48, t + .11);
+  gain.gain.setValueAtTime(.0001, t); gain.gain.exponentialRampToValueAtTime(.11, t + .008); gain.gain.exponentialRampToValueAtTime(.0001, t + .13);
+  osc.connect(gain); gain.connect(mg); osc.start(t); osc.stop(t + .14);
+}
+function musicTick() {
+  const step = ni++ % 16;
+  voice(lead[step], .19, step % 4 === 2 ? 'sine' : 'triangle', .042);
+  // Sparkly off-beat answer notes make it feel more like a tiny game soundtrack.
+  if (step % 2 === 1) voice(lead[(step + 3) % 16] * 2, .09, 'sine', .012, .075);
+  if (step % 2 === 0) voice(bass[Math.floor(step / 2) % bass.length], .25, 'triangle', .048);
+  if (step % 4 === 0) kick();
+}
 async function music(on) {
   if (on) {
     const C = window.AudioContext || window.webkitAudioContext;
     if (!C) { $('ml').textContent = 'No audio'; return; }
-    if (!ac) { ac = new C(); mg = ac.createGain(); mg.gain.value = .65; mg.connect(ac.destination); }
+    if (!ac) { ac = new C(); mg = ac.createGain(); mg.gain.value = .52; mg.connect(ac.destination); }
     await ac.resume();
-    const tick = () => note(mel[ni++ % mel.length]); tick(); mt = setInterval(tick, 560);
-  } else { clearInterval(mt); mt = null; }
+    if (mt !== null) clearInterval(mt);
+    musicTick(); mt = setInterval(musicTick, 220);
+  } else { if (mt !== null) clearInterval(mt); mt = null; }
   $('musicBtn').setAttribute('aria-pressed', on);
-  $('musicBtn').setAttribute('aria-label', on ? 'Turn off gentle melody' : 'Turn on gentle melody');
+  $('musicBtn').setAttribute('aria-label', on ? 'Turn off upbeat music' : 'Turn on upbeat music');
   $('ml').textContent = on ? 'Music on' : 'Music off';
 }
 $('musicBtn').onclick = () => music(mt === null).catch(() => $('ml').textContent = 'Tap to retry');
